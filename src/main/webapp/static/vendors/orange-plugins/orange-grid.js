@@ -6,12 +6,13 @@
     var Grid = function (element, options) {
         this._setVariable(element, options);
         this._setOptions(this._options);
+        this._initEmpty();
         if (this._url != undefined) {
             this._load();
             return;
         }
         if (this._data != undefined) {
-            this._init();
+            this._initByData();
             return;
         }
         console.error("data或url未定义");
@@ -120,9 +121,9 @@
             this._elementId = id;
             this._options = options;
 
-            this._grids = new Object();
+            this._grids = undefined;
             this.$searchForm = undefined;
-            this.$gridWrapper = new Object();
+            this.$gridWrapper = undefined;
             this._total = 0;
             // 搜索栏是否初始化
             this._searchInited = false;
@@ -222,9 +223,8 @@
                 url: that._url + (parameters == undefined ? "" : parameters),
                 success: function (data) {
                     if (data.code === 200) {
-                        that._remove();
                         that._setData(data.data);
-                        that._init();
+                        that._initByData();
                     } else {
                         that._alert(data.message);
                     }
@@ -240,10 +240,14 @@
             this._grids = data.data;
             this._total = data.total;
         },
-        // 初始化
-        _init: function () {
+        _initEmpty: function () {
             this._renderEles();
-            this._regiestEvents();
+        },
+        // 初始化
+        _initByData: function () {
+            this._remove();
+            this._renderEles();
+            this._registerEvents();
             this._doAfterInit();
         },
         // 渲染元素
@@ -709,7 +713,7 @@
             searchFormRow.find('.form-actions').append(searchbtn);
             searchbtn.after("&nbsp;");
             this.$element.append(searchFormRow);
-            this._uniform();
+
             this.$searchForm = searchFormRow.find("form[ele-type='search']");
             if (hide) {
                 searchFormRow.find('.form-body').slideUp(1);
@@ -918,10 +922,22 @@
                 var td = $.tmpl(tdTmpl, {});
                 td.css("text-align", "center");
                 td.attr("colspan", cols);
-                td.html("暂无数据");
+                td.html("暂无数据!");
                 tr.append(td);
                 tbody.append(tr);
-            }
+            };
+            var renderLoadingTbody = function (tbody) {
+                var tr = $.tmpl(trTmpl, {
+                    "class_": "odd gradeX"
+                });
+                var cols = that._columns.length + (that._showCheck == true ? 1 : 0) + (that._showIndexNum ? 1 : 0) + (that._actionColumns ? that._actionColumns.length : 0);
+                var td = $.tmpl(tdTmpl, {});
+                td.css("text-align", "center");
+                td.attr("colspan", cols);
+                td.html("加载中...");
+                tr.append(td);
+                tbody.append(tr);
+            };
             var tbody = $('<tbody></tbody>');
             if (that._grids != undefined && that._grids != null) {
                 if (that._grids.length == 0)
@@ -929,9 +945,10 @@
                 $.each(that._grids, function (index, grid) {
                     renderTbody(tbody, grid, index);
                 });
+            } else {
+                renderLoadingTbody(tbody);
             }
             table.append(tbody);
-
             tableRow.append(table);
             this.$gridWrapper.append(tableRow);
         },
@@ -1075,10 +1092,9 @@
             return totalP;
         },
         // 注册事件
-        _regiestEvents: function () {
+        _registerEvents: function () {
             var that = this;
-            // checkbox相关
-            this.$gridWrapper.find('.group-checkable').change(
+            this.$gridWrapper.find('.group-checkable').on("change",
                 function () {
                     var set = $(this).attr("data-set");
                     var checked = $(this).is(":checked");
@@ -1086,30 +1102,26 @@
                         .each(
                             function () {
                                 if (checked) {
-                                    $(this).attr("checked", true);
+                                    $(this).prop("checked", true);
                                     $(this).parent().parent()
-                                        .parent().parent()
                                         .addClass("active");
                                 } else {
-                                    $(this).attr("checked", false);
+                                    $(this).prop("checked", false);
                                     $(this).parent().parent()
-                                        .parent().parent()
                                         .removeClass("active");
                                 }
                             });
-                    $.uniform.update(set);
                 });
-            this.$gridWrapper.find(".checkboxes").change(
+            this.$gridWrapper.find(".checkboxes").on("change",
                 function () {
                     var checked = $(this).is(":checked");
                     if (checked) {
-                        $(this).parent().parent().parent().parent()
+                        $(this).parent().parent()
                             .addClass("active");
                     } else {
-                        $(this).parent().parent().parent().parent()
+                        $(this).parent().parent()
                             .removeClass("active");
                     }
-                    $.uniform.update($(this));
                 });
             // 分页相关
             this.$gridWrapper.find('ul.pagination li').not(".disabled").on(
@@ -1165,24 +1177,11 @@
                     sort: field + "_asc"
                 });
             });
-            this._uniform();
         },
         // 执行回调
         _doAfterInit: function () {
             if (this._afterInit != undefined)
                 this._afterInit();
-        },
-        _uniform: function () {
-            if (!$().uniform) {
-                return;
-            }
-            var test = $("input[type=checkbox]:not(.toggle), input[type=radio]:not(.toggle)");
-            if (test.size() > 0) {
-                test.each(function () {
-                    $(this).show();
-                    $(this).uniform();
-                });
-            }
         },
         // 销毁
         _remove: function () {
