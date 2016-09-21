@@ -165,7 +165,7 @@
             });
             this.$element.prepend(alertDiv);
             alertDiv.delay(seconds * 1000).fadeOut();
-            App.scrollTo(alertDiv,-200);
+            App.scrollTo(alertDiv, -200);
         },
         _setVariable: function (element, options) {
             this.$element = $(element);
@@ -333,7 +333,7 @@
                 help.append(item.detail);
             }
             if (that._labelInline) {
-                var div = $('<div class="col-md-10"></div>');
+                var div = $('<div formele="' + item.type + '" class="col-md-10"></div>');
                 if (item.showIcon) {
                     item.icon = "";
                 }
@@ -357,7 +357,7 @@
                 wrapper.find(".form-group").append(div);
             } else {
                 if (item.icon != undefined) {
-                    var iconDiv = $('<div class="input-icon '
+                    var iconDiv = $('<div formele="' + item.type + '" class="input-icon '
                         + (item.iconAlign == undefined ? "right"
                             : item.iconAlign) + '"></div>');
                     if (item.cls != undefined) {
@@ -371,7 +371,7 @@
                         wrapper.find(".form-group").append(help);
                     }
                 } else {
-                    var inputWrapper = $('<div></div>')
+                    var inputWrapper = $('<div formele="' + item.type + '"></div>')
                     inputWrapper.append(ele);
                     wrapper.find(".form-group").append(inputWrapper);
                     if (help != undefined) {
@@ -431,6 +431,10 @@
             }
         },
         _formEles: {
+            'html': function (data, form) {
+                var ele = $(data.html);
+                return ele;
+            },
             'display': function (data, form) {
                 var textTmpl = '<p id="${id_}" name="${name_}" ${attribute_} class="form-control-static"></p>';
                 var ele = $.tmpl(textTmpl, {
@@ -1025,6 +1029,7 @@
             this._initTree();
             this._initKindEditor();
             this._initMultiFileUpload();
+            this._initHtmlHandle();
         },
         _uniform: function () {
             if (!$().uniform) {
@@ -1203,6 +1208,14 @@
                         });
                 });
             }
+        },
+        _initHtmlHandle: function () {
+            $("div[formele=html]").each(function () {
+                var data = $(this).parent().parent().data("data");
+                if (data != undefined && data.handle != undefined) {
+                    data.handle($(this));
+                }
+            });
         },
         _renderMultipleFiles: function (table, fieldName, fileIds) {
             var elementData = $(table).data("data");

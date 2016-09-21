@@ -7,7 +7,6 @@
         initIndex();
         initMenu();
     });
-    var that = this;
     var requestMapping = {
         "/api/index": "index"
     };
@@ -157,12 +156,24 @@
                     required: true
                 },
                 message: {
-                    required: "上传附件",
+                    required: "上传附件"
+                }
+            }, {
+                type: 'html',
+                id: 'html',
+                name: 'html',
+                label: '自定义html',
+                html: '<div class="row"><div class="col-md-12"><div class="content-box-header"><div class="panel-title"><a href="javascript:void(0);">New vs Returning Visitors</a></div></div> <div class="content-box-large box-with-header">Pellentesque luctus quam quis consequat vulputate. Sed sit amet diam ipsum. Praesent in </div> </div> </div>',
+                handle: function (ele) {
+                    ele.find("a").click(function (e) {
+                        alert("我点击了自定义链接");
+                        e.preventDefault();
+                    });
                 }
             }]
         };
         var form = App.content.find("#index_grid").orangeForm(formOpts);
-    }
+    };
 
     function initIndex() {
         var token = $.cookie('tc_t');
