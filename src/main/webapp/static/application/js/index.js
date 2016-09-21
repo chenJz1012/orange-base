@@ -47,6 +47,7 @@
                 handle: function () {
                     form.setValue("attachmentIds", 1);
                     form.setValue("roles", "1,2,3");
+                    form.setValue("html", "aaaa");
                 }
             }],
             buttonsAlign: "center",
@@ -163,12 +164,15 @@
                 id: 'html',
                 name: 'html',
                 label: '自定义html',
-                html: '<div class="row"><div class="col-md-12"><div class="content-box-header"><div class="panel-title"><a href="javascript:void(0);">New vs Returning Visitors</a></div></div> <div class="content-box-large box-with-header">Pellentesque luctus quam quis consequat vulputate. Sed sit amet diam ipsum. Praesent in </div> </div> </div>',
-                handle: function (ele) {
+                html: '<div class="row"><div class="col-md-12"><div class="content-box-header"><div class="panel-title"><a href="javascript:void(0);">New vs Returning Visitors</a></div></div> <div class="content-box-large box-with-header"><p class="content">Pellentesque luctus quam quis consequat vulputate. Sed sit amet diam ipsum. Praesent in</p> </div> </div> </div>',
+                eventHandle: function (ele) {
                     ele.find("a").click(function (e) {
                         alert("我点击了自定义链接");
                         e.preventDefault();
                     });
+                },
+                loadHandle: function (ele, value) {
+                    ele.find("p.content").html(value);
                 }
             }]
         };

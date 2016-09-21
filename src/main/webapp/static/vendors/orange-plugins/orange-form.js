@@ -432,7 +432,17 @@
         },
         _formEles: {
             'html': function (data, form) {
-                var ele = $(data.html);
+                var htmlWrapper = '<div id="${id_}" name="${name_}" ${attribute_} ></div>';
+                var ele = $.tmpl(htmlWrapper, {
+                    "id_": (data.id == undefined ? data.name : data.id),
+                    "name_": data.name,
+                    "attribute_": (data.attribute == undefined ? ""
+                        : data.attribute)
+                });
+                ele.append(data.html);
+                if (data.loadHandle != undefined) {
+                    ele.data("load", data.loadHandle);
+                }
                 return ele;
             },
             'display': function (data, form) {
@@ -1209,14 +1219,6 @@
                 });
             }
         },
-        _initHtmlHandle: function () {
-            $("div[formele=html]").each(function () {
-                var data = $(this).parent().parent().data("data");
-                if (data != undefined && data.handle != undefined) {
-                    data.handle($(this));
-                }
-            });
-        },
         _renderMultipleFiles: function (table, fieldName, fileIds) {
             var elementData = $(table).data("data");
             var template = '<tr class="template-upload fade in">'
@@ -1272,6 +1274,14 @@
                     }
                 });
             }
+        },
+        _initHtmlHandle: function () {
+            $("div[formele=html]").each(function () {
+                var data = $(this).parent().parent().data("data");
+                if (data != undefined && data.eventHandle != undefined) {
+                    data.eventHandle($(this));
+                }
+            });
         },
         _initValidate: function () {
             var that = this;
@@ -1512,6 +1522,10 @@
                 this._renderMultipleFiles(ele, name, value);
             } else {
                 ele.val(value);
+            }
+            var loadHandle = ele.data("load");
+            if (loadHandle != undefined) {
+                loadHandle(ele, value);
             }
             this._uniform();
         },
