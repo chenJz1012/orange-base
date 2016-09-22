@@ -1070,7 +1070,7 @@
                         function () {
                             var ele = $(this);
                             var edWith = ele
-                                .data("width") == undefined ? 0 : ele.data("width");
+                                .data("width") == undefined ? "100%" : ele.data("width");
                             var editor = KE
                                 .create(
                                     '#' + ele.attr("id"),
@@ -1091,8 +1091,6 @@
                                         },
                                         resizeType: 1
                                     });
-                            if (edWith == 0)
-                                ele.prev("div.ke-container").addClass("col-md-12").css("width", "");
                             that._editor[ele.attr("id")] = editor;
                         });
             }
