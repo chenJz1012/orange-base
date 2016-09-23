@@ -62,7 +62,7 @@
                 field: "email"
             }],
             actionColumnText: "操作",//操作列文本
-            actionColumnWidth: "20%",
+            actionColumnWidth: "25%",
             actionColumns: [{
                 text: "编辑",
                 cls: "btn-primary btn-sm",
