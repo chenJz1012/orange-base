@@ -7,6 +7,7 @@ import com.orange.base.common.TreeNode;
 import com.orange.base.security.dao.FunctionMapper;
 import com.orange.base.security.model.Function;
 import com.orange.base.security.service.FunctionService;
+import com.orange.base.security.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,9 @@ public class FunctionServiceImpl extends BaseService<Function> implements Functi
 
     @Autowired
     private FunctionMapper functionMapper;
+
+    @Autowired
+    private RoleService roleService;
 
     @Override
     public int insertFunction(Function function) {
@@ -38,7 +42,15 @@ public class FunctionServiceImpl extends BaseService<Function> implements Functi
 
     @Override
     public int deleteFunctionById(int id) {
-        return getMapper().deleteByPrimaryKey(id);
+        int result = getMapper().deleteByPrimaryKey(id);
+        List<Integer> roleIds = functionMapper.findRoleIdsByFunctionId(id);
+        if (roleIds.size() > 0) {
+            functionMapper.deleteRoleFunctionByFunctionId(id);
+            for (Integer roleId : roleIds) {
+                roleService.refreshAuthAndResource(roleId);
+            }
+        }
+        return result;
     }
 
     @Override
