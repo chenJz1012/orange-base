@@ -5,8 +5,22 @@
 (function ($, window, document, undefined) {
     App.menu = {
         "initVerticalMenu": initVerticalMenu,
-        "initSideMenu": initSideMenu
+        "initSideMenu": initSideMenu,
+        "toggleMenu": toggleMenu
     };
+    function toggleMenu() {
+        var toggle = $.cookie('menu-toggle');
+        if (toggle == undefined) {
+            toggle = "v";
+        }
+        if (toggle == "v") {
+            $.cookie('menu-toggle', "s", {expires: 7, path: '/'});
+        } else {
+            $.cookie('menu-toggle', "v", {expires: 7, path: '/'});
+        }
+
+    }
+
     function getSubMenu(menus, menuId) {
         var subMenus = [];
         $.each(menus, function (i, m) {
