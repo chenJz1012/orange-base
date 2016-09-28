@@ -3,10 +3,12 @@
  */
 ;
 (function ($, window, document, undefined) {
-    $(document).ready(function () {
-        initIndex();
-        initMenu();
-    });
+    var token = $.cookie('tc_t');
+    if (token == undefined) {
+        window.location.href = './login.html';
+    }
+    App.token = token;
+
     var requestMapping = {
         "/api/index": "index"
     };
@@ -178,110 +180,8 @@
         };
         var form = App.content.find("#index_grid").orangeForm(formOpts);
     };
-
-    function initIndex() {
-        var token = $.cookie('tc_t');
-        if (token == undefined) {
-            window.location.href = './login.html';
-        }
-        App.token = token;
-    }
-
-    function getSubMenu(menus, menuId) {
-        var subMenus = [];
-        $.each(menus, function (i, m) {
-            if (m.parentId == menuId) {
-                subMenus.push(m);
-            }
-        });
-        return subMenus;
-    }
-
-    function getMenu(menus, menuId) {
-        var subMenus = [];
-        $.each(menus, function (i, m) {
-            if (m.id == menuId) {
-                subMenus.push(m);
-            }
-        });
-        return subMenus;
-    }
-
-    function getTopMenu(menus) {
-        var topMenus = [];
-        $.each(menus, function (i, m) {
-            if (m.parentId == 0) {
-                topMenus.push(m);
-            } else {
-                var subMenus = getMenu(menus, m.parentId);
-                if (subMenus.length == 0) {
-                    topMenus.push(m);
-                }
-            }
-        });
-        return topMenus;
-    }
-
-    function recursionMenu(ele, menus, subMenus) {
-        if (subMenus.length > 0) {
-            ele += "<ul>";
-            $.each(subMenus, function (i, m) {
-                ele += ('<li data-level="sub">'
-                + '<a data-url="' + m.action
-                + '" data-title="' + m.functionName
-                + '" href="javascript:void(0);"><i class="' + (m.icon == null ? "glyphicon glyphicon-list" : m.icon) + '"></i> '
-                + m.functionName
-                + '</a>');
-                var sMenus = getSubMenu(menus, m.id);
-                ele += '</li>';
-            });
-            ele += "</ul>";
-        }
-        return ele;
-    }
-
-    function initMenu() {
-        $.ajax(
-            {
-                type: 'GET',
-                url: "../api/sys/function/current",
-                contentType: "application/json",
-                dataType: "json",
-                beforeSend: function (request) {
-                    request.setRequestHeader("X-Auth-Token", App.token);
-                },
-                success: function (result) {
-                    if (result.code === 200) {
-                        var menus = result.data;
-                        var topMenus = getTopMenu(menus);
-                        $.each(topMenus, function (i, m) {
-                            if (m.parentId == 0) {
-                                var ele = '<li data-level="top">'
-                                    + '<a data-url="' + m.action
-                                    + '" data-title="' + m.functionName
-                                    + '" href="javascript:void(0);"><i class="' + (m.icon == null ? "glyphicon glyphicon-list" : m.icon) + '"></i> '
-                                    + m.functionName
-                                    + '</a>';
-                                var subMenus = getSubMenu(menus, m.id);
-                                if (subMenus.length > 0) {
-                                    ele = recursionMenu(ele, menus, subMenus);
-                                }
-                                ele += '</li>';
-                                var li = $(ele);
-                                li.find("li[data-level=sub]").parents("li[data-level=top]").addClass("submenu").find("a:eq(0)").append('<span class="caret pull-right"></span>');
-                                $("div.sidebar > .nav").append(li);
-                            }
-                        });
-                        App.menu();
-                    } else if (result.code === 401) {
-                        alert("token失效,请登录!");
-                        window.location.href = './login.html';
-                    }
-                },
-                error: function (err) {
-                }
-            }
-        );
-    }
+    $(document).ready(function () {
+        App.menu.initVerticalMenu();
+    });
 
 })(jQuery, window, document);

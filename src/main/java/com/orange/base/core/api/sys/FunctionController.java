@@ -74,22 +74,6 @@ public class FunctionController {
         return ResponseUtil.success();
     }
 
-    @RequestMapping(value = "/current", method = RequestMethod.GET)
-    @ResponseBody
-    public Result myFunction() {
-        String currentLoginName = SecurityUtil.getCurrentUserName();
-        if (StringUtils.isEmpty(currentLoginName)) {
-            throw new AuthBusinessException(AuBzConstant.IS_NOT_LOGIN);
-        }
-        List<FunctionVO> function = (List<FunctionVO>) redisCache
-                .get(SecurityConstant.FUNCTION_CACHE_PREFIX + currentLoginName);
-        if (function == null) {
-            function = userService.findUserFunctionByLoginName(currentLoginName);
-            redisCache.set(SecurityConstant.FUNCTION_CACHE_PREFIX + currentLoginName, function);
-        }
-        return ResponseUtil.success(function);
-    }
-
     @RequestMapping(value = "/treeNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object treeNodes(Function function) {

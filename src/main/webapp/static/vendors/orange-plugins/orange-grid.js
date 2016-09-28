@@ -746,7 +746,7 @@
 
             var colTmpl = '<col width="${width_}"></col>';
             var trTmpl = '<tr role="row" class="${class_}"></tr>';
-            var thTmpl = '<th class="${class_} ${sorting_}" rowspan="1" colspan="1" style="${style_}"></th>';
+            var thTmpl = '<th class="${sorting_} ${class_} " rowspan="1" colspan="1" style="${style_}"></th>';
             var tdTmpl = '<td class="${class_}" style="vertical-align: middle;"></td>';
 
             var tableRow = $.tmpl(Grid.statics.tableRowTmpl, {});
