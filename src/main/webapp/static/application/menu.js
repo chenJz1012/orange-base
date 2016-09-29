@@ -8,6 +8,7 @@
         "initSideMenu": initSideMenu,
         "toggleMenu": toggleMenu
     };
+    App.menusMapping = {};
     function toggleMenu() {
         var toggle = $.cookie('menu-toggle');
         if (toggle == undefined) {
@@ -125,6 +126,9 @@
                 success: function (result) {
                     if (result.code === 200) {
                         var menus = result.data;
+                        $.each(menus, function (i, m) {
+                            App.menusMapping[m.action] = m.functionName;
+                        });
                         var topMenus = getTopMenu(menus);
                         $.each(topMenus, function (i, m) {
                             if (m.parentId == 0) {
@@ -152,15 +156,12 @@
                                     var f = App.requestMapping[url];
                                     if (f != undefined) {
                                         $(this).on("click", function () {
-                                            var title = $(this).attr("data-title");
-                                            App[f].page(title);
-                                            $(this).parent().parent().removeClass("collapse").addClass("in");
-                                            window.history.pushState({}, 0, 'http://' + window.location.host + App.projectName + '/static/index.html#!' + url);
+                                            window.location.href = 'http://' + window.location.host + App.projectName + '/static/index.html?u=' + url;
                                         });
                                     }
                                 }
                             );
-                        refreshHref();
+                        refreshHref(ul);
                     } else if (result.code === 401) {
                         alert("token失效,请登录!");
                         window.location.href = './login.html';
@@ -188,6 +189,9 @@
                     if (result.code === 200) {
                         var menus = result.data;
                         var topMenus = getTopMenu(menus);
+                        $.each(menus, function (i, m) {
+                            App.menusMapping[m.action] = m.functionName;
+                        });
                         $.each(topMenus, function (i, m) {
                             if (m.parentId == 0) {
                                 var subMenus = getSubMenu(menus, m.id);
@@ -195,7 +199,7 @@
                                 var toggle = "";
                                 var cart = "";
                                 if (subMenus.length > 0) {
-                                    dropDown = 'class="dropdown"'
+                                    dropDown = 'class="dropdown"';
                                     toggle = 'class="dropdown-toggle" data-toggle="dropdown"';
                                     cart = '<span class="caret"></span>';
                                 }
@@ -221,18 +225,12 @@
                                     var f = App.requestMapping[url];
                                     if (f != undefined) {
                                         $(this).on("click", function () {
-                                            var title = $(this).attr("data-title");
-                                            App[f].page(title);
-                                            $(this).parent().siblings("li").removeClass("active");
-                                            $(this).parent().parent().parent().siblings("li").removeClass("active");
-                                            $(this).parent().addClass("active");
-                                            $(this).parent().parent().parent().addClass("active");
-                                            window.history.pushState({}, 0, 'http://' + window.location.host + App.projectName + '/static/index.html#!' + url);
+                                            window.location.href = 'http://' + window.location.host + App.projectName + '/static/index.html?u=' + url;
                                         });
                                     }
                                 }
                             );
-                        refreshHref();
+                        refreshHref(ul);
                     } else if (result.code === 401) {
                         alert("token失效,请登录!");
                         window.location.href = './login.html';
@@ -244,19 +242,46 @@
         );
     }
 
-    /**
-     * 完成后执行
-     */
-    var refreshHref = function () {
+    var refreshHref = function (ul) {
         var location = window.location.href;
-        var url = location.substring(location.lastIndexOf("#!") + 2);
-        if (location.lastIndexOf("#!") > 0 && url != undefined && $.trim(url) != "") {
-            $('a[data-url="' + url + '"]').trigger("click");
+        var url = location.substring(location.lastIndexOf("?u=") + 3);
+        if (location.lastIndexOf("?u=") > 0 && url != undefined && $.trim(url) != "") {
+            var title = App.menusMapping[url];
+            var f = App.requestMapping[url];
+            if (f != undefined) {
+                App[f].page(title);
+                var a;
+                if (App.toggle == "v") {
+                    a = $(ul).find("li[class!=dropdown] > a[data-url='" + url + "']");
+                    a.parent().siblings("li").removeClass("active");
+                    a.parent().parent().parent().siblings("li").removeClass("active");
+                    a.parent().addClass("active");
+                    a.parent().parent().parent().addClass("active");
+                } else {
+                    a = $(ul).find("li[class!=submenu] > a[data-url='" + url + "']");
+                    a.addClass("active");
+                    a.parent().parent().removeClass("collapse").addClass("in");
+                }
+
+            }
         } else {
-            window.location.href = window.location.href + "#!/api/index";
-            url = "/api/index";
-            $('a[data-url="' + url + '"]').trigger("click");
+            window.location.href = window.location.href + "?u=/api/index";
         }
 
-    }
+    };
+    $(document).ready(function () {
+        $("#side-vertical").click(function () {
+            App.menu.toggleMenu();
+            window.location.reload();
+        });
+        var toggle = App.toggle = $.cookie('menu-toggle');
+        if (toggle == undefined) {
+            toggle = "v";
+        }
+        if (toggle == "v") {
+            App.menu.initVerticalMenu();
+        } else {
+            App.menu.initSideMenu();
+        }
+    });
 })(jQuery, window, document);

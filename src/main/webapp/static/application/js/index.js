@@ -180,21 +180,5 @@
         };
         var form = App.content.find("#index_grid").orangeForm(formOpts);
     };
-    $(document).ready(function () {
-        $("#side-vertical").click(function () {
-            App.menu.toggleMenu();
-            window.location.reload();
-        });
-        var toggle = $.cookie('menu-toggle');
-        if (toggle == undefined) {
-            toggle = "v";
-        }
-        if (toggle == "v") {
-            App.menu.initVerticalMenu();
-        } else {
-            App.menu.initSideMenu();
-        }
-
-    });
 
 })(jQuery, window, document);
