@@ -262,7 +262,6 @@
                     a.addClass("active");
                     a.parent().parent().removeClass("collapse").addClass("in");
                 }
-
             }
         } else {
             window.location.href = window.location.href + "?u=/api/index";

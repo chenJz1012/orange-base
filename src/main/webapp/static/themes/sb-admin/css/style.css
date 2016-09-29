@@ -532,3 +532,9 @@ table.dataTable thead .sorting:after {
     margin-right: 15px;
     margin-left: 15px;
 }
+
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_asc,
+table.dataTable thead .sorting_desc {
+    background : none;
+}
