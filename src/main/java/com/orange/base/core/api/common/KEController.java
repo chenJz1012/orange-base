@@ -25,9 +25,6 @@ public class KEController {
     @Value("${upload.folder}")
     String uploadFolder;
 
-    @Value("${upload.host}")
-    String uploadHost;
-
     @RequestMapping(value = "/fileUpload", method = RequestMethod.POST)
     public void fileUpload(HttpServletRequest request, HttpServletResponse response,
             @RequestParam(value = "imgFile", required = false) MultipartFile file) throws Exception {
@@ -37,8 +34,7 @@ public class KEController {
                             .getCurrentUserName() + "/";
             // 文件保存目录URL
             String saveUrl =
-                    uploadHost + request.getContextPath() + "/" + uploadFolder + "/" + SecurityUtil.getCurrentUserName()
-                            + "/";
+                    request.getContextPath() + "/" + uploadFolder + "/" + SecurityUtil.getCurrentUserName() + "/";
 
             // 定义允许上传的文件扩展名
             HashMap<String, String> extMap = new HashMap<String, String>();
@@ -138,9 +134,7 @@ public class KEController {
         String rootPath = request.getSession().getServletContext().getRealPath("/") + uploadFolder + "/" + SecurityUtil
                 .getCurrentUserName() + "/";
         // 文件保存目录URL
-        String rootUrl =
-                uploadHost + request.getContextPath() + "/" + uploadFolder + "/" + SecurityUtil.getCurrentUserName()
-                        + "/";
+        String rootUrl = request.getContextPath() + "/" + uploadFolder + "/" + SecurityUtil.getCurrentUserName() + "/";
         // 图片扩展名
         String[] fileTypes = new String[] { "gif", "jpg", "jpeg", "png", "bmp" };
 
