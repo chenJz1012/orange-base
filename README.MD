@@ -21,18 +21,19 @@ Start redis server and edit **config/properties/redis.properties** !
 Edit **/static/application/js/app.js** and set your projectName!
 ###Start the project and enjoy it!
 
-2 Build-in user:
+###Build-in user:
 ```
 User - user:user
 Admin - admin:admin
 ```
 
-3 Welcome page
+###Web 
 ```
-/static/index.html
+https://github.com/chenJz1012/orange-base-web.git
 ```
 
-4. Notice!!
+##nginx conf
 ```
-When using modal and form plugins, you must modal.show() before modal.form() to avoid the kindeditor bug!
+nginx.conf
+orange.com_cross_domain.conf
 ```
