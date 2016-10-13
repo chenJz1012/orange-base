@@ -2,12 +2,13 @@ package com.orange.base.security.security;
 
 import com.orange.base.security.utils.TokenUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -19,6 +20,8 @@ import java.io.IOException;
 
 public class OrangeHttpAuthenticationTokenFilter extends UsernamePasswordAuthenticationFilter {
 
+    private static final Logger logger = LoggerFactory.getLogger(OrangeHttpAuthenticationTokenFilter.class);
+
     private final String PARAM_TOKEN = "orange_token";
 
     @Value("${security.token.header}")
@@ -26,22 +29,15 @@ public class OrangeHttpAuthenticationTokenFilter extends UsernamePasswordAuthent
 
     private TokenUtils tokenUtils;
 
-    private UserDetailsService userDetailsService;
-
     private UserCache userCache;
 
     public void setTokenUtils(TokenUtils tokenUtils) {
         this.tokenUtils = tokenUtils;
     }
 
-    public void setUserDetailsService(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String authToken = httpRequest.getHeader(this.tokenHeader);
         if (StringUtils.isEmpty(authToken)) {
@@ -53,7 +49,6 @@ public class OrangeHttpAuthenticationTokenFilter extends UsernamePasswordAuthent
             if (userDetails != null && this.tokenUtils.validateToken(authToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new OrangeHttpAuthenticationDetails(httpRequest));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }

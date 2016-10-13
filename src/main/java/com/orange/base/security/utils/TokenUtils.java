@@ -109,7 +109,6 @@ public class TokenUtils {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<String, Object>();
         claims.put("user", userDetails.getUsername());
-        claims.put("auth", userDetails.getAuthorities());
         claims.put("created", this.generateCurrentDate());
         return this.generateToken(claims);
     }

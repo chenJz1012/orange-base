@@ -41,7 +41,6 @@
                 class="com.orange.base.security.security.OrangeHttpAuthenticationTokenFilter">
         <beans:property name="authenticationManager" ref="authenticationManager"/>
         <beans:property name="tokenUtils" ref="tokenUtils"/>
-        <beans:property name="userDetailsService" ref="orangeUserService"/>
         <beans:property name="authenticationFailureHandler"
                         ref="osHttpAuthenticationFailureHandler"/>
         <beans:property name="userCache" ref="userCache"/>
