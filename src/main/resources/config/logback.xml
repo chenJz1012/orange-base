@@ -72,9 +72,9 @@
         <appender-ref ref="debuglog"/>
     </root>
 
-    <logger name="com.orange.base" level="INFO">
+   <!-- <logger name="com.orange.base" level="INFO">
         <appender-ref ref="db-classic-mysql-pool"/>
-    </logger>
+    </logger>-->
 
     <logger name="com.ibatis" level="DEBUG"/>
     <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="DEBUG"/>

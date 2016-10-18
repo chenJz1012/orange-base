@@ -69,7 +69,6 @@ public class AttachmentServiceImpl extends BaseService<Attachment> implements IA
 
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
         String newFileName = df.format(new Date()) + "_" + new Random().nextInt(1000) + "_" + fileName;
-
         FileUtil.saveFileFromInputStream(file.getInputStream(), savePath, newFileName);
 
         Attachment attachment = new Attachment();

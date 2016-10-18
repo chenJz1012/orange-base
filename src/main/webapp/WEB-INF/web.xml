@@ -53,10 +53,6 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <listener>
-        <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher
-        </listener-class>
-    </listener>
     <!-- 配置spiring security结束 -->
 
     <!-- springMVC核心配置 -->

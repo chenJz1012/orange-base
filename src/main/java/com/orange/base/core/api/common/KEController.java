@@ -23,7 +23,7 @@ import java.util.*;
 public class KEController {
 
     @Value("${upload.folder}")
-    String uploadFolder;
+    private String uploadFolder;
 
     @RequestMapping(value = "/fileUpload", method = RequestMethod.POST)
     public void fileUpload(HttpServletRequest request, HttpServletResponse response,

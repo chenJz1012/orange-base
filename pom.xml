@@ -409,6 +409,20 @@
                 <version>${jedis.version}</version>
             </dependency>
 
+            <!-- https://mvnrepository.com/artifact/com.github.junrar/junrar -->
+            <dependency>
+                <groupId>com.github.junrar</groupId>
+                <artifactId>junrar</artifactId>
+                <version>0.7</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant</artifactId>
+                <version>1.9.6</version>
+            </dependency>
+
+
         </dependencies>
     </dependencyManagement>
 
@@ -703,6 +717,18 @@
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.github.junrar/junrar -->
+        <dependency>
+            <groupId>com.github.junrar</groupId>
+            <artifactId>junrar</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+        </dependency>
+
 
     </dependencies>
 
