@@ -18,7 +18,7 @@ import java.util.HashMap;
 
 /**
  * Created by chenguojun on 8/31/16.
- * 通用api 我的信息 查看通知公告
+ * 通用上传api
  */
 @Controller
 @RequestMapping("/api/common")
