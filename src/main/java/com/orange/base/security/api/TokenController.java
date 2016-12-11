@@ -79,22 +79,4 @@ public class TokenController {
         return ResponseEntity.ok(HttpResponseUtil.success(token));
     }
 
-    @RequestMapping(value = "/refresh", method = RequestMethod.GET)
-    public ResponseEntity<?> authenticationRequest(HttpServletRequest request) {
-        String token = request.getHeader(this.tokenHeader);
-        String username = this.tokenUtils.getUsernameFromToken(token);
-        OrangeSecurityUser user = (OrangeSecurityUser) this.userDetailsService.loadUserByUsername(username);
-        if (this.tokenUtils.canTokenBeRefreshed(token, user.getLastPasswordReset())) {
-            String refreshedToken = this.tokenUtils.refreshToken(token);
-            return ResponseEntity.ok(HttpResponseUtil.success(refreshedToken));
-        } else {
-            return ResponseEntity.badRequest().body(HttpResponseUtil.error());
-        }
-    }
-
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    public ResponseEntity<?> protect() {
-        return ResponseEntity.ok(HttpResponseUtil.data("YEAH!"));
-    }
-
 }

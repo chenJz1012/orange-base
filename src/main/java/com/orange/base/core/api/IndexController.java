@@ -5,6 +5,7 @@ import com.orange.base.common.utils.Result;
 import com.orange.base.security.SecurityConstant;
 import com.orange.base.security.exception.AuBzConstant;
 import com.orange.base.security.exception.AuthBusinessException;
+import com.orange.base.security.security.OrangeSideUserCache;
 import com.orange.base.security.service.FunctionService;
 import com.orange.base.security.service.UserService;
 import com.orange.base.security.utils.SecurityUtil;
@@ -26,7 +27,7 @@ import java.util.Map;
  * Created by chenguojun on 8/23/16.
  */
 @Controller
-@RequestMapping("/api/index")
+@RequestMapping("/api")
 public class IndexController {
 
     @Autowired
@@ -39,9 +40,9 @@ public class IndexController {
     RedisCache redisCache;
 
     @Autowired
-    private FreeMarkerUtil freeMarkerUtil;
+    OrangeSideUserCache orangeSideUserCache;
 
-    @RequestMapping(value = "/current", method = RequestMethod.GET)
+    @RequestMapping(value = "/index/current", method = RequestMethod.GET)
     @ResponseBody
     public Result myFunction() {
         String currentLoginName = SecurityUtil.getCurrentUserName();
@@ -55,5 +56,13 @@ public class IndexController {
             redisCache.set(SecurityConstant.FUNCTION_CACHE_PREFIX + currentLoginName, function);
         }
         return ResponseUtil.success(function);
+    }
+
+    @RequestMapping(value = "/logout", method = RequestMethod.GET)
+    @ResponseBody
+    public Result authenticationRequest() {
+        Integer userId = SecurityUtil.getCurrentUserId();
+        orangeSideUserCache.removeUserFromCacheByUserId(userId);
+        return ResponseUtil.success();
     }
 }
