@@ -3,7 +3,6 @@ package com.orange.base.security.security;
 import com.orange.base.common.IBasicCache;
 import com.orange.base.security.SecurityConstant;
 import com.orange.base.security.service.UserService;
-import com.orange.base.tools.redis.RedisCache;
 import com.orange.base.security.vo.FunctionVO;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.core.userdetails.UserCache;
@@ -17,30 +16,29 @@ import java.util.List;
  */
 public class OrangeSideUserCache implements UserCache, InitializingBean {
 
-    private IBasicCache<String, UserDetails> cache = new OrangeSideNullCache<String, UserDetails>();
-
-    private RedisCache redisCache;
+    private IBasicCache<String, Object> cache = null;
 
     private UserService userService;
-
-    public void setRedisCache(RedisCache redisCache) {
-        this.redisCache = redisCache;
-    }
 
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
 
+    public void setCache(IBasicCache<String, Object> cache) {
+        this.cache = cache;
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
-        Assert.notNull(cache);
+        if (this.cache == null) this.cache = new OrangeSideNullCache<String, Object>();
+        Assert.notNull(this.cache);
     }
 
     @Override
     public UserDetails getUserFromCache(String username) {
         UserDetails userDetails = null;
         try {
-            userDetails = (UserDetails) redisCache.get(SecurityConstant.USER_CACHE_PREFIX + username);
+            userDetails = (UserDetails) cache.get(SecurityConstant.USER_CACHE_PREFIX + username);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -52,18 +50,14 @@ public class OrangeSideUserCache implements UserCache, InitializingBean {
     @Override
     public void putUserInCache(UserDetails user) {
         cache.set(SecurityConstant.USER_CACHE_PREFIX + user.getUsername(), user);
-        List<FunctionVO> function = userService.findUserFunctionByLoginName(user.getUsername());
-        redisCache.set(SecurityConstant.FUNCTION_CACHE_PREFIX + user.getUsername(), function);
+        List<FunctionVO> functionList = userService.findUserFunctionByLoginName(user.getUsername());
+        cache.set(SecurityConstant.FUNCTION_CACHE_PREFIX + user.getUsername(), functionList);
     }
 
     @Override
     public void removeUserFromCache(String username) {
         cache.del(SecurityConstant.USER_CACHE_PREFIX + username);
-        redisCache.del(SecurityConstant.FUNCTION_CACHE_PREFIX + username);
-    }
-
-    public void setCache(IBasicCache<String, UserDetails> cache) {
-        this.cache = cache;
+        cache.del(SecurityConstant.FUNCTION_CACHE_PREFIX + username);
     }
 
     public void removeUserFromCacheByUserId(Integer userId) {
