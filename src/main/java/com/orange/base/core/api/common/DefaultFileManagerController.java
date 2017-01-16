@@ -1,12 +1,13 @@
 package com.orange.base.core.api.common;
 
-import com.alibaba.fastjson.JSONObject;
 import com.orange.base.common.utils.CompressUtil;
-import com.orange.base.common.utils.FileManagerUtil;
 import com.orange.base.common.utils.FileUtil;
 import com.orange.base.common.utils.ResponseUtil;
-import com.orange.base.core.dto.FileDto;
 import com.orange.base.security.utils.SecurityUtil;
+import com.orange.base.tools.filemanager.DefaultFileManagerTool;
+import com.orange.base.tools.filemanager.FolderDto;
+import com.orange.base.tools.filemanager.OssFileManagerTool;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,24 +18,33 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by cgj on 2015/12/8.
  */
 @Controller
 @RequestMapping("/api/fileManager")
-public class FileManagerController {
+public class DefaultFileManagerController {
 
     @Value("${upload.folder}")
     private String uploadFolder;
 
-    @RequestMapping("/files")
+    @Autowired
+    private DefaultFileManagerTool defaultFileManagerTool;
+
+    @Autowired
+    private OssFileManagerTool ossFileManagerTool;
+
+    @RequestMapping("/folder")
     public
     @ResponseBody
-    Object files(HttpServletRequest request, @RequestParam(value = "path", defaultValue = "") String path) {
+    Object folder(HttpServletRequest request, @RequestParam(value = "path", defaultValue = "") String path) {
         String rootPath = request.getSession().getServletContext().getRealPath("/") + uploadFolder + "/" + SecurityUtil
                 .getCurrentUserName() + "/";
         File rootFolder = new File(rootPath);
@@ -43,62 +53,16 @@ public class FileManagerController {
         }
         // 文件保存目录URL
         String rootUrl = request.getContextPath() + "/" + uploadFolder + "/" + SecurityUtil.getCurrentUserName() + "/";
-        // 最后一个字符不是/
-        if (!"".equals(path) && !path.endsWith("/")) {
-            path += "/";
-        }
-        // 根据path参数，设置各路径和URL
-        String currentPath = rootPath + path;
-        String currentUrl = rootUrl + path;
-        String currentDirPath = path;
-        String moveUpDirPath = "";
-        if (!"".equals(path)) {
-            String str = currentDirPath.substring(0, currentDirPath.length() - 1);
-            moveUpDirPath = str.lastIndexOf("/") >= 0 ? str.substring(0, str.lastIndexOf("/") + 1) : "";
-        }
+        FolderDto folderDto = defaultFileManagerTool.folder(rootPath, rootUrl, path);
+        return ResponseUtil.success(folderDto);
+    }
 
-        // 不允许使用..移动到上一级目录
-        if (path.indexOf("..") >= 0) {
-            return ResponseUtil.error("Access is not allowed.");
-        }
-        // 目录不存在或不是目录
-        File currentPathFile = new File(currentPath);
-        if (!currentPathFile.isDirectory()) {
-            return ResponseUtil.error("Directory does not exist.");
-        }
-        // 遍历目录取的文件信息
-        List<FileDto> fileList = new ArrayList<FileDto>();
-        if (currentPathFile.listFiles() != null) {
-            for (File file : currentPathFile.listFiles()) {
-                FileDto fileDto = new FileDto();
-                Hashtable<String, Object> hash = new Hashtable<String, Object>();
-                String fileName = file.getName();
-                if (file.isDirectory()) {
-                    fileDto.setIsDirectory(true);
-                    fileDto.setHashFile(file.listFiles() != null);
-                    fileDto.setFileSize(0L);
-                    fileDto.setType("");
-                } else if (file.isFile()) {
-                    String fileExt = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-                    fileDto.setIsDirectory(false);
-                    fileDto.setHashFile(false);
-                    fileDto.setFileSize(file.length());
-                    fileDto.setType(fileExt);
-                }
-                fileDto.setName(fileName);
-                fileDto.setPath(file.getPath());
-                fileDto.setLastModifed(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(file.lastModified()));
-                fileList.add(fileDto);
-            }
-        }
-        Collections.sort(fileList);
-        JSONObject msg = new JSONObject();
-        msg.put("moveUpDirPath", moveUpDirPath);
-        msg.put("currentDirPath", currentDirPath);
-        msg.put("currentUrl", currentUrl);
-        msg.put("total", fileList.size());
-        msg.put("files", fileList);
-        return ResponseUtil.success(msg);
+    @RequestMapping("/oss/folder")
+    public
+    @ResponseBody
+    Object ossFolder(HttpServletRequest request, @RequestParam(value = "path", defaultValue = "") String path) {
+        FolderDto folderDto = ossFileManagerTool.folder("", "", path);
+        return ResponseUtil.success(folderDto);
     }
 
     @RequestMapping(value = "/createFolder", method = RequestMethod.POST)
@@ -109,7 +73,7 @@ public class FileManagerController {
                 httpServletRequest.getSession().getServletContext().getRealPath("/") + uploadFolder + "/" + SecurityUtil
                         .getCurrentUserName() + "/";
         String wholeRealPath = rootPath + dirPath;
-        FileManagerUtil.mkDir(wholeRealPath);
+        defaultFileManagerTool.createDir(wholeRealPath);
         return ResponseUtil.success();
     }
 
@@ -122,7 +86,7 @@ public class FileManagerController {
                 httpServletRequest.getSession().getServletContext().getRealPath("/") + uploadFolder + "/" + SecurityUtil
                         .getCurrentUserName() + "/";
         String wholeRealPath = rootPath + folderPath;
-        return FileManagerUtil.renameFile(wholeRealPath, oldName, newName);
+        return defaultFileManagerTool.rename(wholeRealPath, oldName, newName);
     }
 
     @RequestMapping(value = "/deleteFolder", method = RequestMethod.POST)
@@ -133,7 +97,7 @@ public class FileManagerController {
                 httpServletRequest.getSession().getServletContext().getRealPath("/") + uploadFolder + "/" + SecurityUtil
                         .getCurrentUserName() + "/";
         String wholeRealPath = rootPath + dirPath;
-        FileManagerUtil.delFolder(wholeRealPath);
+        defaultFileManagerTool.removeDir(wholeRealPath);
         return ResponseUtil.success();
     }
 
@@ -145,7 +109,7 @@ public class FileManagerController {
                 httpServletRequest.getSession().getServletContext().getRealPath("/") + uploadFolder + "/" + SecurityUtil
                         .getCurrentUserName() + "/";
         String wholeRealPath = rootPath + filePath;
-        FileManagerUtil.delFile(wholeRealPath);
+        defaultFileManagerTool.removeFile(wholeRealPath);
         return ResponseUtil.success();
     }
 
@@ -153,28 +117,11 @@ public class FileManagerController {
     public void downloadFile(HttpServletResponse response, HttpServletRequest httpServletRequest,
             @RequestParam(value = "folderPath") String folderPath, @RequestParam(value = "fileName") String fileName)
             throws UnsupportedEncodingException {
-        response.setCharacterEncoding("utf-8");
-        response.setContentType("multipart/form-data");
-        response.setHeader("Content-Disposition",
-                "attachment;fileName=" + new String(fileName.getBytes("gbk"), "iso-8859-1"));
-        try {
-            String rootPath = httpServletRequest.getSession().getServletContext().getRealPath("/") + uploadFolder + "/"
-                    + SecurityUtil.getCurrentUserName() + "/";
-            String wholeRealPath = rootPath + folderPath + "/" + fileName;
-            File file = new File(wholeRealPath);
-            InputStream inputStream = new FileInputStream(file);
-            OutputStream os = response.getOutputStream();
-            byte[] b = new byte[1024];
-            int length;
-            while ((length = inputStream.read(b)) > 0) {
-                os.write(b, 0, length);
-            }
-            inputStream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String rootPath =
+                httpServletRequest.getSession().getServletContext().getRealPath("/") + uploadFolder + "/" + SecurityUtil
+                        .getCurrentUserName() + "/";
+        String filePath = rootPath + folderPath + "/" + fileName;
+        defaultFileManagerTool.download(response, filePath, fileName);
     }
 
     @RequestMapping("/upload")
@@ -237,60 +184,6 @@ public class FileManagerController {
             ResponseUtil.error("文件格式不正确！");
         }
         return ResponseUtil.success();
-    }
-
-    @SuppressWarnings("rawtypes")
-    class NameComparator implements Comparator {
-
-        public int compare(Object a, Object b) {
-            Hashtable hashA = (Hashtable) a;
-            Hashtable hashB = (Hashtable) b;
-            if (((Boolean) hashA.get("is_dir")) && !((Boolean) hashB.get("is_dir"))) {
-                return -1;
-            } else if (!((Boolean) hashA.get("is_dir")) && ((Boolean) hashB.get("is_dir"))) {
-                return 1;
-            } else {
-                return ((String) hashA.get("filename")).compareTo((String) hashB.get("filename"));
-            }
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
-    class SizeComparator implements Comparator {
-
-        public int compare(Object a, Object b) {
-            Hashtable hashA = (Hashtable) a;
-            Hashtable hashB = (Hashtable) b;
-            if (((Boolean) hashA.get("is_dir")) && !((Boolean) hashB.get("is_dir"))) {
-                return -1;
-            } else if (!((Boolean) hashA.get("is_dir")) && ((Boolean) hashB.get("is_dir"))) {
-                return 1;
-            } else {
-                if (((Long) hashA.get("filesize")) > ((Long) hashB.get("filesize"))) {
-                    return 1;
-                } else if (((Long) hashA.get("filesize")) < ((Long) hashB.get("filesize"))) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            }
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
-    class TypeComparator implements Comparator {
-
-        public int compare(Object a, Object b) {
-            Hashtable hashA = (Hashtable) a;
-            Hashtable hashB = (Hashtable) b;
-            if (((Boolean) hashA.get("is_dir")) && !((Boolean) hashB.get("is_dir"))) {
-                return -1;
-            } else if (!((Boolean) hashA.get("is_dir")) && ((Boolean) hashB.get("is_dir"))) {
-                return 1;
-            } else {
-                return ((String) hashA.get("filetype")).compareTo((String) hashB.get("filetype"));
-            }
-        }
     }
 
 }

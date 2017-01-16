@@ -1,4 +1,4 @@
-package com.orange.base.core.dto;
+package com.orange.base.tools.filemanager;
 
 /**
  * Created by chenguojun on 2016/10/18.
@@ -17,14 +17,24 @@ public class FileDto implements Comparable {
 
     private Long fileSize;
 
-    private String lastModifed;
+    private String lastModified;
 
-    public String getLastModifed() {
-        return lastModifed;
+    private String hashKey;
+
+    public String getHashKey() {
+        return hashKey;
     }
 
-    public void setLastModifed(String lastModifed) {
-        this.lastModifed = lastModifed;
+    public void setHashKey(String hashKey) {
+        this.hashKey = hashKey;
+    }
+
+    public String getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(String lastModified) {
+        this.lastModified = lastModified;
     }
 
     public String getType() {
@@ -81,4 +91,12 @@ public class FileDto implements Comparable {
         return fileDto.getIsDirectory().compareTo(this.getIsDirectory());
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof FileDto) {
+            return this.hashKey != null && this.hashKey.equals(((FileDto) obj).getHashKey());
+        } else {
+            return false;
+        }
+    }
 }
