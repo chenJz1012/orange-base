@@ -1,8 +1,9 @@
 package com.orange.base.tools.filemanager;
 
 import com.orange.base.common.exception.DefaultBusinessException;
-import com.orange.base.common.utils.FileManagerUtil;
+import com.orange.base.common.utils.FileUtil;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -113,5 +114,10 @@ public class DefaultFileManagerTool implements IFileManager {
             e.printStackTrace();
             throw new DefaultBusinessException("Download fail.");
         }
+    }
+
+    @Override
+    public void upload(MultipartFile multipartFile, String dir) throws IOException {
+        FileUtil.saveFileFromInputStream(multipartFile.getInputStream(), dir, multipartFile.getOriginalFilename());
     }
 }

@@ -1,8 +1,6 @@
 package com.orange.base.core.api.common;
 
-import com.orange.base.common.utils.FileUtil;
 import com.orange.base.common.utils.ResponseUtil;
-import com.orange.base.security.utils.SecurityUtil;
 import com.orange.base.tools.filemanager.FolderDto;
 import com.orange.base.tools.filemanager.OssFileManagerTool;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,17 +81,8 @@ public class OssFileManagerController {
     public
     @ResponseBody
     Object singleUpload(@RequestParam(value = "file") MultipartFile multipartFile,
-            @RequestParam(value = "folderPath") String folderPath, HttpServletRequest httpServletRequest)
-            throws IOException {
-        if (multipartFile == null || multipartFile.isEmpty()) {
-            return ResponseUtil.error("请先上传附件");
-        }
-        String rootPath =
-                httpServletRequest.getSession().getServletContext().getRealPath("/") + uploadFolder + "/" + SecurityUtil
-                        .getCurrentUserName() + "/";
-        String wholeRealPath = rootPath + folderPath;
-        FileUtil.saveFileFromInputStream(multipartFile.getInputStream(), wholeRealPath,
-                multipartFile.getOriginalFilename());
+            @RequestParam(value = "folderPath") String folderPath) throws IOException {
+        ossFileManagerTool.upload(multipartFile, folderPath);
         return ResponseUtil.success();
     }
 

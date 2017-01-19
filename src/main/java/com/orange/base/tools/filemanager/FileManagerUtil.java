@@ -1,4 +1,4 @@
-package com.orange.base.common.utils;
+package com.orange.base.tools.filemanager;
 
 /**
  * Created by chenguojun on 2016/10/18.

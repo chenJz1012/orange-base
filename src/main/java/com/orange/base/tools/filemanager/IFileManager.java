@@ -1,6 +1,9 @@
 package com.orange.base.tools.filemanager;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -19,5 +22,7 @@ public interface IFileManager {
     void removeFile(String filePath);
 
     void download(HttpServletResponse response, String filePath, String fileName);
+
+    void upload(MultipartFile multipartFile, String dir) throws IOException;
 
 }

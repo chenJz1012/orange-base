@@ -1,7 +1,6 @@
 package com.orange.base.core.api.common;
 
 import com.orange.base.common.utils.CompressUtil;
-import com.orange.base.common.utils.FileUtil;
 import com.orange.base.common.utils.ResponseUtil;
 import com.orange.base.security.utils.SecurityUtil;
 import com.orange.base.tools.filemanager.DefaultFileManagerTool;
@@ -137,8 +136,7 @@ public class DefaultFileManagerController {
                 httpServletRequest.getSession().getServletContext().getRealPath("/") + uploadFolder + "/" + SecurityUtil
                         .getCurrentUserName() + "/";
         String wholeRealPath = rootPath + folderPath;
-        FileUtil.saveFileFromInputStream(multipartFile.getInputStream(), wholeRealPath,
-                multipartFile.getOriginalFilename());
+        defaultFileManagerTool.upload(multipartFile, wholeRealPath);
         return ResponseUtil.success();
     }
 

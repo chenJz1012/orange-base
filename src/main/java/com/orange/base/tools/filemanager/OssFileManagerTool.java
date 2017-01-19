@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -48,10 +49,14 @@ public class OssFileManagerTool implements IFileManager {
     @Value("${bucketName}")
     private String BUCKET_NAME;
 
-    @Autowired
-    private OssUtil ossUtil;
+    private final OssUtil ossUtil;
 
     private OSSClient client = null;
+
+    @Autowired
+    public OssFileManagerTool(OssUtil ossUtil) {
+        this.ossUtil = ossUtil;
+    }
 
     @PostConstruct
     public void init() {
@@ -72,7 +77,7 @@ public class OssFileManagerTool implements IFileManager {
         String moveUpDirPath = "";
         String tmu = dir;
         if (tmu.endsWith("/")) tmu = dir.substring(0, dir.length() - 1);
-        if (tmu.indexOf("/") != -1) {
+        if (tmu.contains("/")) {
             moveUpDirPath = tmu.substring(0, tmu.lastIndexOf("/"));
         } else {
             moveUpDirPath = root;
@@ -121,7 +126,7 @@ public class OssFileManagerTool implements IFileManager {
     public void createDir(String dir) {
         try {
             if (dir.startsWith("/")) dir = dir.substring(1, dir.length());
-            client.putObject(BUCKET_NAME, dir+"/", new ByteArrayInputStream(new byte[0]));
+            client.putObject(BUCKET_NAME, dir + "/", new ByteArrayInputStream(new byte[0]));
         } catch (OSSException oe) {
             oe.printStackTrace();
         }
@@ -174,5 +179,11 @@ public class OssFileManagerTool implements IFileManager {
             e.printStackTrace();
             throw new DefaultBusinessException("Download fail.");
         }
+    }
+
+    @Override
+    public void upload(MultipartFile multipartFile, String dir) {
+        if (dir.endsWith("/")) dir = dir.substring(0, dir.length() - 1);
+        ossUtil.upload(multipartFile, dir + "/");
     }
 }
