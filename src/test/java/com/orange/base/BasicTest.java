@@ -1,7 +1,7 @@
 package com.orange.base;
 
-import com.orange.base.tools.freemarker.FreeMarkerUtil;
-import com.orange.base.tools.redis.RedisCache;
+import com.orange.common.tools.freemarker.FreeMarkerUtil;
+import com.orange.common.tools.cache.RedisCache;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

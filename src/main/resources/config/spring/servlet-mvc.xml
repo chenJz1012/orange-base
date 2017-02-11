@@ -12,7 +12,6 @@
 
     <context:property-placeholder location="classpath*:config/properties/*.properties"/>
 
-    <mvc:resources location="/static/" mapping="/static/**"/>
     <mvc:resources location="/upload/" mapping="/upload/**"/>
     <!-- 开启注解 -->
     <mvc:annotation-driven>
@@ -30,7 +29,7 @@
     </mvc:annotation-driven>
 
     <context:component-scan
-            base-package="com.orange.base.*.handler,com.orange.base.*.api.**"/>
+            base-package="com.orange.*.handler,com.orange.*.api.**"/>
 
     <!--通用视图解析器 -->
     <bean id="viewResolverCommon"

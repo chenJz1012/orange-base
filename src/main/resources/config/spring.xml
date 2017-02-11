@@ -11,8 +11,8 @@
             location="
             classpath*:config/properties/*.properties"
             ignore-unresolvable="true"/>
-    <import resource="classpath*:/config/spring/spring-*.xml"/>
     <import resource="classpath*:/config/spring/init-*.xml"/>
+    <import resource="classpath*:/config/spring/spring-*.xml"/>
     <context:component-scan
-            base-package="com.orange.base.*.service,com.orange.base.tools.*,com.orange.base.*.utils.*"/>
+            base-package="com.orange.*.service,com.orange.common.*,com.orange.*.task,com.orange.*.thread"/>
 </beans>

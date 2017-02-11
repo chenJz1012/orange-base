@@ -10,8 +10,6 @@
     http://www.springframework.org/schema/aop
     http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
 
-    <bean class="com.orange.base.basedao.flyway.Migrate"/>
-
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
           init-method="init" destroy-method="close">
         <property name="driverClassName">
@@ -58,10 +56,10 @@
         <property name="dataSource" ref="dataSource"/>
         <property name="mapperLocations">
             <array>
-                <value>classpath*:mapper/**/*.xml</value>
+                <value>classpath*:mapper/core/**/*.xml</value>
             </array>
         </property>
-        <property name="typeAliasesPackage" value="com.orange.base.*.model"/>
+        <property name="typeAliasesPackage" value="com.orange.database.core.model"/>
         <property name="plugins">
             <array>
                 <bean class="com.github.pagehelper.PageHelper">
@@ -81,12 +79,13 @@
     </bean>
 
     <bean class="tk.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.orange.base.*.dao"/>
+        <property name="basePackage" value="com.orange.database.core.dao"/>
         <property name="properties">
             <value>
                 mappers=tk.mybatis.mapper.common.Mapper
             </value>
         </property>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
     </bean>
 
     <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
@@ -94,7 +93,7 @@
     </bean>
     <aop:aspectj-autoproxy/>
     <aop:config>
-        <aop:pointcut id="appService" expression="execution(* com.orange.base.*.service.*.*(..))"/>
+        <aop:pointcut id="appService" expression="execution(* com.orange.system.*.service.*.*(..))"/>
         <aop:advisor advice-ref="txAdvice" pointcut-ref="appService"/>
     </aop:config>
 
