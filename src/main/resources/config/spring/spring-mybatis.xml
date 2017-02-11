@@ -93,7 +93,7 @@
     </bean>
     <aop:aspectj-autoproxy/>
     <aop:config>
-        <aop:pointcut id="appService" expression="execution(* com.orange.system.*.service.*.*(..))"/>
+        <aop:pointcut id="appService" expression="execution(* com.orange.*.*.service.*.*(..))"/>
         <aop:advisor advice-ref="txAdvice" pointcut-ref="appService"/>
     </aop:config>
 
