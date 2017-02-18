@@ -32,7 +32,14 @@ public class FunctionServiceImpl extends BaseService<Function> implements Functi
 
     @Override
     public int updateFunction(Function function) {
-        return getMapper().updateByPrimaryKeySelective(function);
+        int result = getMapper().updateByPrimaryKeySelective(function);
+        List<Integer> roleIds = functionMapper.findRoleIdsByFunctionId(function.getId());
+        if (roleIds.size() > 0) {
+            for (Integer roleId : roleIds) {
+                roleService.refreshAuthAndResource(roleId);
+            }
+        }
+        return result;
     }
 
     @Override
