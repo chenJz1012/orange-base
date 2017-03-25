@@ -4,7 +4,6 @@ import com.github.pagehelper.PageInfo;
 import com.orange.common.utils.PageConvertUtil;
 import com.orange.common.utils.ResponseUtil;
 import com.orange.common.utils.Result;
-import com.orange.common.utils.TreeNode;
 import com.orange.database.core.model.Role;
 import com.orange.security.service.RoleService;
 import com.orange.security.service.UserService;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by cgj on 2016/4/9.
@@ -69,8 +69,7 @@ public class RoleController {
     @RequestMapping(value = "/treeNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object treeNodes(Role role) {
-        List<TreeNode> list = roleService.getRoleTreeNodes(role);
-        return list;
+        return roleService.getRoleTreeNodes(role);
     }
 
     @RequestMapping(value = "/hasRoleUserList", method = RequestMethod.GET)
@@ -100,6 +99,13 @@ public class RoleController {
             @RequestParam(value = "userId") Integer userId) {
         userService.deleteUserRole(userId, roleId);
         return ResponseUtil.success();
+    }
+
+    @RequestMapping(value = "/roleUserCount", method = RequestMethod.GET)
+    @ResponseBody
+    public Result roleUserCount(Role role) {
+        List<Map> list = roleService.selectRoleUserCount(role);
+        return ResponseUtil.success(PageConvertUtil.grid(list));
     }
 
 }

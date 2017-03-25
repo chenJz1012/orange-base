@@ -2,13 +2,14 @@
 
 
 ###Build-in user:
-```
-User - user:user
+
+>User - user:user <br>
 Admin - admin:admin
-```
+
 
 ###Web 
 
-![orange-base-web](https://github.com/chenJz1012/orange-base-web.git)
+
+[orange-base-web](https://github.com/chenJz1012/orange-base-web.git)
 
 

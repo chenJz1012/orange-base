@@ -28,4 +28,6 @@ public interface RoleMapper extends Mapper<Role> {
     void deleteUserRoleRelateByRoleId(Integer id);
 
     List<Integer> findHasRoleUserIdsByRoleId(@Param("roleId") Integer roleId);
+
+    List<Map> selectRoleUserCount(@Param("role")Role role);
 }

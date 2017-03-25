@@ -92,6 +92,11 @@ public class RoleServiceImpl extends BaseService<Role> implements RoleService {
     }
 
     @Override
+    public List<Map> selectRoleUserCount(Role role) {
+        return roleMapper.selectRoleUserCount(role);
+    }
+
+    @Override
     public List<Map> findRoleMatchUpFunctions() {
         return roleMapper.findRoleMatchUpFunctions();
     }

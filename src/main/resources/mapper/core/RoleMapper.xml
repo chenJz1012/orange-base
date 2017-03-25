@@ -88,4 +88,21 @@
     <select id="findHasRoleUserIdsByRoleId" resultType="java.lang.Integer">
         select user_id from sys_user_role where role_id=#{roleId}
     </select>
+    <select id="selectRoleUserCount" resultType="java.util.Map">
+        select
+        role_name roleName,
+        count(distinct ur.user_id) userCount,
+        count(distinct rf.function_id) functionCount
+        from orange_base.sys_role r
+        inner join orange_base.sys_user_role ur
+        on r.id=ur.role_id
+        inner join orange_base.sys_role_function rf
+        on r.id = rf.role_id
+        <where>
+            <if test="role.roleName != null and role.roleName != ''">
+                role_name like concat('%',concat(#{role.roleName}, '%'))
+            </if>
+        </where>
+        group by role_name
+    </select>
 </mapper>

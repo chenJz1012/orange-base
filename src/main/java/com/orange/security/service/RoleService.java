@@ -39,4 +39,6 @@ public interface RoleService extends IService<Role> {
     PageInfo<HasRoleUserDto> findHasRoleUserDtoListByRoleId(int pageNum, int pageSize, HasRoleUserDto hasRoleUserDto);
 
     void refreshAuthAndResource(Integer roleId);
+
+    List<Map> selectRoleUserCount(Role role);
 }
