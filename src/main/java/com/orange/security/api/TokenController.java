@@ -1,11 +1,12 @@
 package com.orange.security.api;
 
+import com.orange.common.tools.cache.RedisCache;
 import com.orange.common.utils.HttpResponseUtil;
 import com.orange.security.constant.SecurityConstant;
 import com.orange.security.security.OrangeAuthenticationRequest;
 import com.orange.security.security.OrangeHttpAuthenticationDetails;
-import com.orange.common.tools.cache.RedisCache;
 import com.orange.security.utils.TokenUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +48,18 @@ public class TokenController {
     @RequestMapping(value = "/generate", method = RequestMethod.POST)
     public ResponseEntity<?> authenticationRequest(@RequestBody OrangeAuthenticationRequest authenticationRequest)
             throws AuthenticationException {
+        if (StringUtils.isEmpty(authenticationRequest.getVcode()) || StringUtils
+                .isEmpty(authenticationRequest.getVkey())) {
+            return ResponseEntity.ok(HttpResponseUtil.error("请输入验证码"));
+        }
+        if (StringUtils.isNotEmpty((String) redisCache.get(authenticationRequest.getVkey()))) {
+            if (!((String) redisCache.get(authenticationRequest.getVkey())).equals(authenticationRequest.getVcode())) {
+                return ResponseEntity.ok(HttpResponseUtil.error("验证码不正确"));
+            }
+        } else {
+            return ResponseEntity.ok(HttpResponseUtil.error("验证码不存在或已过期"));
+        }
+        redisCache.del(authenticationRequest.getVkey());
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                 authenticationRequest.getUsername(), authenticationRequest.getPassword());
         usernamePasswordAuthenticationToken.setDetails(new OrangeHttpAuthenticationDetails());
