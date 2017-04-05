@@ -7,7 +7,6 @@ import com.orange.database.core.dao.UserMapper;
 import com.orange.database.core.model.User;
 import com.orange.security.security.OrangeSecurityMetadataSourceImpl;
 import com.orange.security.security.OrangeSideUserCache;
-import com.orange.security.service.RoleService;
 import com.orange.security.service.UserService;
 import com.orange.security.utils.SecurityUtil;
 import com.orange.security.vo.FunctionVO;
@@ -26,9 +25,6 @@ public class UserServiceImpl extends BaseService<User> implements UserService {
 
     @Autowired
     UserMapper userMapper;
-
-    @Autowired
-    RoleService roleService;
 
     @Autowired
     OrangeSideUserCache orangeSideUserCache;
@@ -60,7 +56,6 @@ public class UserServiceImpl extends BaseService<User> implements UserService {
         }
         if (result > 0) {
             orangeSideUserCache.removeUserFromCacheByUserId(user.getId());
-            OrangeSecurityMetadataSourceImpl.refreshResourceMap();
         }
         return result;
     }
@@ -89,7 +84,6 @@ public class UserServiceImpl extends BaseService<User> implements UserService {
         int result = userMapper.insertUserRole(userId, roleId);
         if (result > 0) {
             orangeSideUserCache.removeUserFromCacheByUserId(userId);
-            OrangeSecurityMetadataSourceImpl.refreshResourceMap();
         }
         return result;
     }
@@ -141,7 +135,6 @@ public class UserServiceImpl extends BaseService<User> implements UserService {
         int result = userMapper.deleteUserAllRoles(userId);
         if (result > 0) {
             orangeSideUserCache.removeUserFromCacheByUserId(userId);
-            OrangeSecurityMetadataSourceImpl.refreshResourceMap();
         }
         return result;
     }
@@ -151,7 +144,6 @@ public class UserServiceImpl extends BaseService<User> implements UserService {
         int result = userMapper.deleteUserRole(userId, roleId);
         if (result > 0) {
             orangeSideUserCache.removeUserFromCacheByUserId(userId);
-            OrangeSecurityMetadataSourceImpl.refreshResourceMap();
         }
         return result;
     }
