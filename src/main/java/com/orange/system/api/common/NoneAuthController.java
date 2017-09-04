@@ -20,6 +20,7 @@ import java.io.IOException;
 @Controller
 @RequestMapping("/api/noneAuth")
 public class NoneAuthController {
+
     @Autowired
     private UserService userService;
 
@@ -32,6 +33,13 @@ public class NoneAuthController {
         int count = userService.countByLoginName(loginName);
         return count > 0 ? false : true;
     }
+
+    @RequestMapping("/wechatToken")
+    @ResponseBody
+    public String unique() {
+        return "chenJz1012";
+    }
+
     @RequestMapping("/captcha")
     public void captcha(@RequestParam("vkey") String vkey, HttpServletRequest httpServletRequest,
             HttpServletResponse httpServletResponse) throws IOException {

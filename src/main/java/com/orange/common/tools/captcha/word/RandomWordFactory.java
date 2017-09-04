@@ -39,9 +39,9 @@ public class RandomWordFactory implements WordFactory {
     }
 
     public RandomWordFactory() {
-        characters = "absdegkmnopwx23456789";
-        minLength = 6;
-        maxLength = 6;
+        characters = "0123456789";
+        minLength = 4;
+        maxLength = 4;
     }
 
     @Override
