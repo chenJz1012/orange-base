@@ -6,7 +6,6 @@ import com.orange.common.tools.captcha.utils.ImageUtils;
 import com.orange.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * Created by chenguojun on 8/31/16.
@@ -36,11 +36,11 @@ public class NoneAuthController {
     }
 
     @RequestMapping("/wechatToken")
-    @ResponseBody
-    public String token(HttpServletResponse response, @RequestParam(value = "echostr") String echostr) {
-        response.setContentType("text/plain");
-        response.setCharacterEncoding("UTF-8");
-        return echostr;
+    public void token(HttpServletResponse response, @RequestParam(value = "echostr") String echostr)
+            throws IOException {
+        PrintWriter out = response.getWriter();
+        out.println(echostr);
+        out.close();
     }
 
     @RequestMapping("/captcha")
