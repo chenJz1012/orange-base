@@ -36,8 +36,8 @@ public class NoneAuthController {
 
     @RequestMapping("/wechatToken")
     @ResponseBody
-    public String unique() {
-        return "ycFBSuZYDJEAKeaNhYRnVDhGTY1mPSKrOZuLCSJ7IIR";
+    public String token(@RequestParam(value = "echostr") String echostr) {
+        return echostr;
     }
 
     @RequestMapping("/captcha")
