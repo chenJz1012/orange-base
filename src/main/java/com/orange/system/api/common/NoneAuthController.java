@@ -37,6 +37,7 @@ public class NoneAuthController {
     @RequestMapping("/wechatToken")
     @ResponseBody
     public String token(@RequestParam(value = "echostr") String echostr) {
+        System.out.println(echostr);
         return echostr;
     }
 
